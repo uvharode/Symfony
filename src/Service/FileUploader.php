@@ -22,7 +22,10 @@ class FileUploader
         $setFileName = $this->slugger->slug($originalFileName);
         $originaltMimeType = pathinfo($file->getClientMimeType(), PATHINFO_EXTENSION);
         $setMimeType = $this->slugger->slug($originaltMimeType);
-        $fileName = $setFileName.'.csv';
+        if($setMimeType == 'ms-excel'){
+            $setMimeType = '.csv';
+        }
+        $fileName = $setFileName.$setMimeType;
     
         try{
         $file->move($this->getTargetDirectory(), $fileName);

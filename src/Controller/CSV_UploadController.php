@@ -160,17 +160,26 @@ class CSV_UploadController extends AbstractController
 
         if($form->isSubmitted() && $form->isValid())
         {
+            //$content = $form->getData();
+
             $content = $form->get('content_of')->getData();
 
             if($content)
             {
               $file_content = $fileUploader->uploading($content);
-                $upload->setFileContent($file_content);
+              $upload->setFileContent($file_content);
             }
+
+            $original = $content->getClientOriginalName();
+            $file = 'C:/xampp/htdocs/Symfony-assignment/CSV_Upload/public/uploads/content/'. $original;
+            $filedata = file_get_contents($file);
+
 
             $dm->persist($upload);
             $dm->flush(); 
-            return $this->redirectToRoute('app_upload_content');
+
+            return new Response('Success '.$upload->getId().$filedata);
+          //  return $this->redirectToRoute('app_upload_content');
         }
          return $this->render('upload/new.html.twig',[
         'form' => $form->createView(),
@@ -198,9 +207,8 @@ class CSV_UploadController extends AbstractController
         //('C:/xampp/htdocs/Symfony-assignment/CSV_Upload/public/uploads/content/data-csv.csv'), 'csv');
        // print_r($file_name);
 
-      
-      $file = 'C:/xampp/htdocs/Symfony-assignment/CSV_Upload/public/uploads/content/data-csv.csv';
-     
+      $originalName = 'data.csv';
+      $file = 'C:/xampp/htdocs/Symfony-assignment/CSV_Upload/public/uploads/content/'. $originalName;
       $filedata = file_get_contents($file);
 
       $response = new Response($filedata);
@@ -208,7 +216,6 @@ class CSV_UploadController extends AbstractController
         return new Response($response);
 
     }
-
 
 }
 

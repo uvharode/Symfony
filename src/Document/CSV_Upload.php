@@ -13,10 +13,10 @@ class CSV_Upload
      * @MongoDB\Id
      */
     protected $id;
-    /** @MongoDB\Field(type="hash") */
-    protected $file_content;
     /** @MongoDB\Field(type="string") */
     protected $filename;
+    /** @MongoDB\Field(type="string") */
+    protected $file_content;
     /** @MongoDB\Field(type="string") */
     protected $uplodedBy;
       
@@ -38,14 +38,6 @@ class CSV_Upload
     public function getFileContent()
     {
         return $this->file_content;
-
-        // $file_content = $this->file_content;
-        // if($file_content != NULL){
-        //     return explode(" ",$file_content);
-        // }
-        // else {
-        //     return $this->file_content;
-        // }
     }
     public function setFileContent($file_content)
     {

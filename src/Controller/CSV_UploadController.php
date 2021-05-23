@@ -169,13 +169,13 @@ public function index()
         if($form->isSubmitted() && $form->isValid())
         {
 
-            $content[1] = $form->get('file_content')->getData();
-           // dd($content[1]);
-            if($content[1])
+            $content = $form->get('file_content')->getData();
+            
+            if($content)
             {
-                $originalFilename = pathinfo($content[1]->
+                $originalFilename = pathinfo($content->
                                     getClientOriginalName(),PATHINFO_FILENAME);
-                $mimeType = pathinfo($content[1]->
+                $mimeType = pathinfo($content->
                                     getClientMimeType(), PATHINFO_EXTENSION);
                 if($mimeType == 'ms-excel'){
                     $mimeType = 'csv';
@@ -183,7 +183,7 @@ public function index()
                 $newFilename = $originalFilename.'.'.$mimeType;
 
                 try{
-                    $content[1]->move(
+                    $content->move(
                         $this->getParameter('content_directory'),$newFilename
                     );
                 } catch (FileException $e) {
@@ -197,10 +197,10 @@ public function index()
                 $serializer = new Serializer([new ObjectNormalizer()], [new CsvEncoder()]);
                 $serializer = $this->get('serializer');
                $data = $serializer->encode($filedata, 'csv');
-                $da = $serializer->decode($data,'csv');
-                 dd($da);
+            // $da = $serializer->decode($data,'csv');
+            // dd($da);
 
-                $upload->setFileContent($da);
+                $upload->setFileContent($data);
 
                 $uploader = $form->get('uploadedBy')->getData();
                 $upload->setUploadedBy($uploader);

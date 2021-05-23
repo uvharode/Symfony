@@ -19,9 +19,7 @@ class UploadType extends AbstractType
     {
         $builder
             ->add('uploadedBy', TextType::class)
-            ->add('file_content', FileType::class, array(
-                'multiple' => true
-            ))
+            ->add('file_content', FileType::class)
             ;
     }
 

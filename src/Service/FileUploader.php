@@ -18,9 +18,11 @@ class FileUploader
 
     public function uploading(UploadedFile $file)
     {
-        $originalFileName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        $originalFileName = pathinfo($file->
+            getClientOriginalName(), PATHINFO_FILENAME);
         $setFileName = $this->slugger->slug($originalFileName);
-        $originaltMimeType = pathinfo($file->getClientMimeType(), PATHINFO_EXTENSION);
+        $originaltMimeType = pathinfo($file->
+            getClientMimeType(), PATHINFO_EXTENSION);
         $setMimeType = $this->slugger->slug($originaltMimeType);
         if($setMimeType == 'ms-excel'){
             $setMimeType = '.csv';

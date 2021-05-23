@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %} 
+{% block body %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card bg-light mb-3 mt-3">
+        <div class="card-body">
+          <div class="card-header">File Data</div>
+
+          
+          <table class="table">
+            <tr>
+              <th> FileName </th>
+              <th> Content </th>
+              <th> Uploaded By </th>
+            </tr>
+            
+            <tr>
+              <td>{{ filename }}</td>
+              <td>
+              {# {% for fileContent in fileContents %} #}
+              {{ fileContent }}
+              {# {% endfor %} #}
+              </td>
+              <td>{{ uploadedBy }}</td>
+            </tr>
+           
+          </table>
+         
+          
+        </div>
+      </div>
+     
+     
+      
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,33 +1,25 @@
 <?php
 
 namespace App\Document;
-
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
-use DateTimeInterface;
-
 /**
- * @MongoDB\Document
+ * @MongoDB\Document(collection="csv")
  */
 class CSV_Upload
 {
+
     /**
      * @MongoDB\Id
-     * */
+     */
     protected $id;
-    /**@MongoDB\Field(type="string")*/
-    protected $filename;
-    /**@MongoDB\Field(type="date")*/
-    protected $uploadDate;
-    /**@MongoDB\Field(type="file")*/
+    /** @MongoDB\Field(type="hash") */
     protected $file_content;
-    /**@MongoDB\Field(type="int")*/
-    protected $length;
-    /**@MongoDB\Field(type="int")*/
-    protected $chunkSize;
-    /**@MongoDB\Field(type="string")*/
-    protected $md5;
-
+    /** @MongoDB\Field(type="string") */
+    protected $filename;
+    /** @MongoDB\Field(type="string") */
+    protected $uplodedBy;
+      
     public function getId()
     {
         return $this->id;
@@ -46,30 +38,30 @@ class CSV_Upload
     public function getFileContent()
     {
         return $this->file_content;
+
+        // $file_content = $this->file_content;
+        // if($file_content != NULL){
+        //     return explode(" ",$file_content);
+        // }
+        // else {
+        //     return $this->file_content;
+        // }
     }
     public function setFileContent($file_content)
     {
         $this->file_content = $file_content;
         return $this;
     }
-    public function getChunkSize()
-    {
-        return $this->chunkSize;
-    }
 
-    public function getLength()
+    public function getUploadedBy()
     {
-        return $this->length;
+        return $this->uplodedBy;
     }
-
-    public function getMd5()
+    public function setUploadedBy(string $uplodedBy)
     {
-        return $this->md5;
+        $this->uplodedBy = $uplodedBy;
+        return $this;
     }
-
-    public function getUploadDate()
-    {
-        return $this->uploadDate;
-    }
+   
     
 }

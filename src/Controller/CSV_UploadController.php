@@ -8,6 +8,7 @@ use App\Form\Type\UploadType;
 use App\Service\FileUploader;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Response;
@@ -41,8 +42,6 @@ class CSV_UploadController extends AbstractController
         return $this->render('upload/testUpload.html.twig',[
             'file_name' => $upload->getFileName(),
             'file_content' => $upload->getFileContent(),
-            'chunkSize' => $upload->getChunkSize(),
-            'uploadDate' => $upload->getUploadDate(),
         ]);
     }
 
@@ -150,7 +149,16 @@ class CSV_UploadController extends AbstractController
 ////////////////////////////////////////////////////////
 
 /**
-  *@Route("/newCreate")
+ * @Route("/")
+ */
+public function index()
+{
+    return $this->render('upload/index.html.twig');
+}
+
+
+/**
+  *@Route("/newCreate", name = "newCreate")
   */
     public function newCreate(DocumentManager $dm, Request $request, FileUploader $fileUploader)
     {
@@ -160,26 +168,49 @@ class CSV_UploadController extends AbstractController
 
         if($form->isSubmitted() && $form->isValid())
         {
-            //$content = $form->getData();
 
-            $content = $form->get('content_of')->getData();
-
-            if($content)
+            $content[1] = $form->get('file_content')->getData();
+           // dd($content[1]);
+            if($content[1])
             {
-              $file_content = $fileUploader->uploading($content);
-              $upload->setFileContent($file_content);
+                $originalFilename = pathinfo($content[1]->
+                                    getClientOriginalName(),PATHINFO_FILENAME);
+                $mimeType = pathinfo($content[1]->
+                                    getClientMimeType(), PATHINFO_EXTENSION);
+                if($mimeType == 'ms-excel'){
+                    $mimeType = 'csv';
+                }
+                $newFilename = $originalFilename.'.'.$mimeType;
+
+                try{
+                    $content[1]->move(
+                        $this->getParameter('content_directory'),$newFilename
+                    );
+                } catch (FileException $e) {
+
+                }
+                $upload->setFileName($newFilename);
+
+                $file = 'C:/xampp/htdocs/Symfony-assignment/CSV_Upload/public/uploads/content/'. $newFilename;
+                $filedata = file_get_contents($file);
+
+                $serializer = new Serializer([new ObjectNormalizer()], [new CsvEncoder()]);
+                $serializer = $this->get('serializer');
+               $data = $serializer->encode($filedata, 'csv');
+                $da = $serializer->decode($data,'csv');
+                 dd($da);
+
+                $upload->setFileContent($da);
+
+                $uploader = $form->get('uploadedBy')->getData();
+                $upload->setUploadedBy($uploader);
+               
             }
-
-            $original = $content->getClientOriginalName();
-            $file = 'C:/xampp/htdocs/Symfony-assignment/CSV_Upload/public/uploads/content/'. $original;
-            $filedata = file_get_contents($file);
-
-
             $dm->persist($upload);
             $dm->flush(); 
-
-            return new Response('Success '.$upload->getId().$filedata);
-          //  return $this->redirectToRoute('app_upload_content');
+           
+            return $this->redirectToRoute('app_upload_content',
+                    array('id' => $upload->getId()));
         }
          return $this->render('upload/new.html.twig',[
         'form' => $form->createView(),
@@ -187,33 +218,29 @@ class CSV_UploadController extends AbstractController
     }
 
     /**
-     * @Route("/success", name="app_upload_content")
+     * @Route("/content/{id}", name="app_upload_content")
      */
-    public function success()
+    public function upload_content(Request $request, $id, DocumentManager $dm)
     {
-        return new Response("Uploaded SuccessFully");
+        $fileId = $request->attributes->get('id');
+        $upload = $dm->getRepository(CSV_Upload::class)->find($fileId);
+
+        if (!$upload) {
+            throw $this->createNotFoundException(
+                'No product found for id '.$fileId
+            );
+        }
+        return $this->render('upload/show.html.twig',[
+            'filename' => $upload->getFileName(),
+            'fileContent' => $upload->getFileContent(),
+            'uploadedBy' => $upload->getUploadedBy(),
+        ]);
     }
 
-    /**
-     * @Route("/CSV")
-     */
-    public function CSVIndex()
+    public function csv()
     {
-       // $serializer = new Serializer([new ObjectNormalizer()], [new CsvEncoder()]);
-        // $serializer = $container->get('serializer');
-        // $serializer->encode($data, 'csv');
-        //$publicpath = '/../CSV_Upload/public/uploads/content/';
-      //  $file_name = $serializer->decode(file_get_contents
-        //('C:/xampp/htdocs/Symfony-assignment/CSV_Upload/public/uploads/content/data-csv.csv'), 'csv');
-       // print_r($file_name);
-
-      $originalName = 'data.csv';
-      $file = 'C:/xampp/htdocs/Symfony-assignment/CSV_Upload/public/uploads/content/'. $originalName;
-      $filedata = file_get_contents($file);
-
-      $response = new Response($filedata);
-
-        return new Response($response);
+        $serializer = new Serializer([new ObjectNormalizer()], [new CsvEncoder()]);
+        $serializer = $this->get('serializer');
 
     }
 

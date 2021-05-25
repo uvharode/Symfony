@@ -26,93 +26,18 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 class CSV_UploadController extends AbstractController
 {
 
-    /**
-     * @Route("/testUpload", methods={"GET"})
-     */
-    public function testUpload(DocumentManager $dm) : Response
-    {
-        $upload = new CSV_Upload();
-        $upload->setFileName("trial");
-        $upload->setFileContent('C:\Users\urvashih\Documents\Images\urvashi-26th');
-        // $upload->setUploadedAt(new \DateTime('now'));
-        $dm->persist($upload);
-        $dm->flush();
-        // return new Response("Data Uploaded " . $upload->getFileName());
+    
 
-        return $this->render('upload/testUpload.html.twig',[
-            'file_name' => $upload->getFileName(),
-            'file_content' => $upload->getFileContent(),
-        ]);
-    }
+    
 
-    /**
-     * @Route("/task")
-     */
-    public function task (Request $request) : Response
-    {
-        $upload = new CSV_Upload();
-        //$upload->setFileName("trial-2");
-        // $upload->setUploadedAt(new \DateTime('now'));
-
-        $form = $this->createForm(UploadType::class,$upload);
-
-        return $this->render('upload/new.html.twig', [
-            'form' => $form->createView(),
-        ]);
-    }
-
-    /**
-     * @Route("/formCreate")
-     */
-
-    public function formCreate (Request $request, DocumentManager $dm )
-    {
-        $upload = new CSV_Upload();
-
-        $form = $this->createForm(UploadType::class, $upload);
-
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid())
-        {
-            $upload = $form->getData();
-            //
-            $dm->persist($upload);
-            $dm->flush();            
-
-            return new Response(
-                "Data Uploaded Successfully, Id - "
-             . $upload->getId()
-             . " , FileName = " 
-             .$upload->getFileName() 
-             . $upload->getFileContent()
-            .$upload->getChunkSize());
-
-            // return $this->redirectToRoute('Success');
-        }
-
-        return $this->render('upload/new.html.twig',[
-            'form' => $form->createView(),
-        ]);
-
-    }
 
     /**
      * @Route("/findUpload")
      */
     public function showUpload(Request $request, DocumentManager $dm)
     {
-        $upload = new CSV_Upload();
-        $form = $this->createForm(ShowType::class, $upload);
-        
-        $form->handleRequest($request);
-        if($form->isSubmitted() && $form->isValid())
-        {
             $upload = $dm->getRepository(CSV_Upload::class)->findAll($request);
-            
-            // $upload = $this->get('doctrine_mongodb')
-            // ->getRepository(CSV_Upload::class)
-            // ->findOneByFileId($request);
-            
+          
             if(! $upload){
                 throw $this->createNotFoundException('Not Upload on this ID');
             }
@@ -121,10 +46,11 @@ class CSV_UploadController extends AbstractController
 
                 return new Response('Upload found, file name is' . $upload);
             }
-        }
+        
         return $this->render('upload/find.html.twig',[
-            'form' => $form->createView(),
-        ]);
+
+            
+            ]);
     }
 /**
  * @Route("/showImage")
@@ -197,8 +123,8 @@ public function index()
                 $serializer = new Serializer([new ObjectNormalizer()], [new CsvEncoder()]);
                 $serializer = $this->get('serializer');
                $data = $serializer->encode($filedata, 'csv');
-            // $da = $serializer->decode($data,'csv');
-            // dd($da);
+            //  $da = $serializer->decode($data,'csv');
+            //  dd($da);
 
                 $upload->setFileContent($data);
 
@@ -220,14 +146,14 @@ public function index()
     /**
      * @Route("/content/{id}", name="app_upload_content")
      */
-    public function upload_content(Request $request, $id, DocumentManager $dm)
+    public function upload_content(Request $request, DocumentManager $dm)
     {
         $fileId = $request->attributes->get('id');
         $upload = $dm->getRepository(CSV_Upload::class)->find($fileId);
 
         if (!$upload) {
             throw $this->createNotFoundException(
-                'No product found for id '.$fileId
+                'No file found for id '.$fileId
             );
         }
         return $this->render('upload/show.html.twig',[

@@ -26,11 +26,6 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 class CSV_UploadController extends AbstractController
 {
 
-    
-
-    
-
-
     /**
      * @Route("/findUpload")
      */
@@ -123,8 +118,8 @@ public function index()
                 $serializer = new Serializer([new ObjectNormalizer()], [new CsvEncoder()]);
                 $serializer = $this->get('serializer');
                $data = $serializer->encode($filedata, 'csv');
-            //  $da = $serializer->decode($data,'csv');
-            //  dd($da);
+            //   $da = $serializer->decode($data,'csv');
+            //   dd($da);
 
                 $upload->setFileContent($data);
 

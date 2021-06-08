@@ -26,49 +26,6 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 class CSV_UploadController extends AbstractController
 {
 
-    /**
-     * @Route("/findUpload")
-     */
-    public function showUpload(Request $request, DocumentManager $dm)
-    {
-            $upload = $dm->getRepository(CSV_Upload::class)->findAll($request);
-          
-            if(! $upload){
-                throw $this->createNotFoundException('Not Upload on this ID');
-            }
-            else
-            {
-
-                return new Response('Upload found, file name is' . $upload);
-            }
-        
-        return $this->render('upload/find.html.twig',[
-
-            
-            ]);
-    }
-/**
- * @Route("/showImage")
- */
-    public function showImage(DocumentManager $dm)
-    {
-        $upload = new CSV_Upload();
-        $upload = $dm->createQueryBuilder('C:\Users\urvashih\Documents\Images\urvashi-26th')
-            ->field('filename')->equals('trial')
-            ->getQuery()
-            ->getSingleResult();
-            
-        header('Content-type: image/png;');
-        return $upload->getFileContent();
-    }
-
-    public function getContent(string $file_content)
-    {
-        $content = file_get_contents($file_content);
-        return $content;
-    }
-////////////////////////////////////////////////////////
-
 /**
  * @Route("/")
  */
@@ -156,13 +113,6 @@ public function index()
             'fileContent' => $upload->getFileContent(),
             'uploadedBy' => $upload->getUploadedBy(),
         ]);
-    }
-
-    public function csv()
-    {
-        $serializer = new Serializer([new ObjectNormalizer()], [new CsvEncoder()]);
-        $serializer = $this->get('serializer');
-
     }
 
 }
